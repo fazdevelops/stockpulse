@@ -195,14 +195,9 @@ tr:hover td{background:rgba(255,255,255,.018);}
 
 /* ── SETTINGS PANEL ── */
 .settings-overlay{
-  visibility:hidden;opacity:0;pointer-events:none;
+  display:none !important;
   position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;
-  backdrop-filter:blur(4px);display:flex;justify-content:flex-end;
-  transition:opacity .2s,visibility .2s;
-}
-.settings-overlay.open,
-.settings-overlay[data-open="true"]{
-  visibility:visible;opacity:1;pointer-events:auto;
+  backdrop-filter:blur(4px);flex-direction:row;justify-content:flex-end;
 }
 .settings-panel{background:var(--bg2);border-left:1px solid var(--border2);width:min(420px,100vw);height:100vh;overflow-y:auto;padding:0;display:flex;flex-direction:column;animation:slideRight .25s ease;}
 @keyframes slideRight{from{transform:translateX(60px);opacity:0}to{transform:none;opacity:1}}
@@ -1166,12 +1161,9 @@ function openSettings(){
     try{ if(typeof onPortfolioInput==='function') onPortfolioInput(); }catch(e){}
   }catch(err){ console.warn('Settings populate error:', err); }
 
-  // Show overlay — try every possible method simultaneously
   const o = document.getElementById('settingsOverlay');
-  if(!o){ console.error('settingsOverlay not found!'); return; }
-  o.classList.add('open');
-  o.setAttribute('data-open','true');
-  o.style.cssText = 'visibility:visible!important;opacity:1!important;pointer-events:auto!important;display:flex!important;position:fixed!important;inset:0!important;z-index:9999!important;background:rgba(0,0,0,.7)!important;justify-content:flex-end!important;backdrop-filter:blur(4px)!important;';
+  if(!o) return;
+  o.style.setProperty('display','flex','important');
   document.body.style.overflow = 'hidden';
 }
 
@@ -1182,11 +1174,7 @@ function closeSettings(e){
 
 function closeSettingsBtn(){
   const o = document.getElementById('settingsOverlay');
-  if(o){
-    o.classList.remove('open');
-    o.removeAttribute('data-open');
-    o.style.cssText = '';
-  }
+  if(o) o.style.setProperty('display','none','important');
   document.body.style.overflow = '';
 }
 function saveSettings(){
@@ -2643,6 +2631,9 @@ function switchTab(name,el){
 // ════════════════════════════════════════════════
 document.getElementById('dateChip').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 window.onload=()=>{
+  // Ensure settings overlay is hidden on load - prevents tap blocking
+  const ov = document.getElementById('settingsOverlay');
+  if(ov) ov.style.setProperty('display','none','important');
   updateStatusBar();
   loadWatchlist();
   loadCryptoWl();
